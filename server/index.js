@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { createServer } from "http";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -12,8 +13,10 @@ import commentRoutes from "./routes/comment.js";
 import historyRoutes from "./routes/history.js";
 import likeRoutes from "./routes/like.js";
 import watchlaterRoutes from "./routes/watchlater.js";
+import meetingRoutes from "./routes/meeting.js";
 
 import { syncUploadsFolder } from "./controllers/video.js";
+import { initSocketServer } from "./socket.js";
 
 dotenv.config();
 
@@ -22,6 +25,10 @@ const __dirname = path.dirname(__filename);
 const uploadsPath = path.join(__dirname, "uploads");
 
 const app = express();
+const httpServer = createServer(app);
+
+// Init Socket.IO on the same HTTP server
+initSocketServer(httpServer);
 
 // Middleware & CORS for Vercel -> Render cross-origin communication
 app.use(cors({
@@ -54,6 +61,7 @@ app.use("/comment", commentRoutes);
 app.use("/history", historyRoutes);
 app.use("/like", likeRoutes);
 app.use("/watchlater", watchlaterRoutes);
+app.use("/meeting", meetingRoutes);
 
 // Test route
 app.get("/", (req, res) => {
@@ -62,7 +70,7 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
