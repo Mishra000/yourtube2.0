@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import axiosInstance from "@/lib/axiosinstance";
+import axiosInstance, { getVideoUrl } from "@/lib/axiosinstance";
 import { useUser } from "@/lib/AuthContext";
 
 export default function HistoryContent() {
@@ -89,8 +89,7 @@ export default function HistoryContent() {
       <div className="space-y-4">
         {history.map((item) => {
           if (!item.videoid) return null;
-          const rawPath = item.videoid.filepath ? item.videoid.filepath.replace(/\\/g, "/") : "";
-          const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+          const videoSrc = getVideoUrl(item.videoid.filepath);
 
           return (
             <div key={item._id} className="flex gap-4 group">

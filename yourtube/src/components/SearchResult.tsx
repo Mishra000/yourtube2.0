@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import axiosInstance from "@/lib/axiosinstance";
+import axiosInstance, { getVideoUrl } from "@/lib/axiosinstance";
 import { Play } from "lucide-react";
 
 const SearchResult = ({ query }: { query: string }) => {
@@ -73,8 +73,7 @@ const SearchResult = ({ query }: { query: string }) => {
 
       <div className="space-y-4">
         {results.map((video: any) => {
-          const rawPath = video?.filepath ? video.filepath.replace(/\\/g, "/") : "";
-          const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+          const videoSrc = getVideoUrl(video?.filepath);
           const channelName = video.videochanel || "Unknown Channel";
 
           return (

@@ -1,20 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
+import { getVideoUrl } from "@/lib/axiosinstance";
 
-interface RelatedVideosProps {
-  videos: Array<{
-    _id: string;
-    videotitle: string;
-    videochanel: string;
-    views: number;
-    createdAt: string;
-  }>;
-}
-const vid = "/video/vdo.mp4";
 export default function RelatedVideos({ videos }: { videos?: any[] }) {
   const safeList = Array.isArray(videos) ? videos : [];
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
   if (safeList.length === 0) {
     return null;
@@ -24,8 +14,7 @@ export default function RelatedVideos({ videos }: { videos?: any[] }) {
     <div className="space-y-3">
       <h3 className="font-semibold text-base text-gray-900 mb-2">Related Videos</h3>
       {safeList.map((video) => {
-        const rawPath = video?.filepath ? video.filepath.replace(/\\/g, "/") : "";
-        const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+        const videoSrc = getVideoUrl(video?.filepath);
 
         return (
           <Link

@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/lib/AuthContext";
-import axiosInstance from "@/lib/axiosinstance";
+import axiosInstance, { getVideoUrl } from "@/lib/axiosinstance";
 
 export default function LikedVideosContent() {
   const [likedVideos, setLikedVideos] = useState<any[]>([]);
@@ -89,8 +89,7 @@ export default function LikedVideosContent() {
       <div className="space-y-4">
         {likedVideos.map((item) => {
           if (!item.videoid) return null;
-          const rawPath = item.videoid.filepath ? item.videoid.filepath.replace(/\\/g, "/") : "";
-          const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+          const videoSrc = getVideoUrl(item.videoid.filepath);
 
           return (
             <div key={item._id} className="flex gap-4 group">

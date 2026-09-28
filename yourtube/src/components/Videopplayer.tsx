@@ -1,6 +1,5 @@
-"use client";
-
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
+import { getVideoUrl } from "@/lib/axiosinstance";
 
 interface VideoPlayerProps {
   video: {
@@ -13,9 +12,7 @@ interface VideoPlayerProps {
 
 export default function VideoPlayer({ video }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const rawPath = video?.filepath ? video.filepath.replace(/\\/g, "/") : "";
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-  const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+  const videoSrc = getVideoUrl(video?.filepath);
 
   return (
     <div className="aspect-video bg-black rounded-xl overflow-hidden flex items-center justify-center">
@@ -24,7 +21,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
           ref={videoRef}
           className="w-full h-full"
           controls
-          autoPlay
+          playsInline
         >
           <source src={videoSrc} type={video?.filetype || "video/mp4"} />
           Your browser does not support the video tag.

@@ -3,13 +3,11 @@ import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useState } from "react";
 import { Play } from "lucide-react";
+import { getVideoUrl } from "@/lib/axiosinstance";
 
 export default function VideoCard({ video }: { video: any }) {
   const [videoError, setVideoError] = useState(false);
-
-  const rawPath = video?.filepath ? video.filepath.replace(/\\/g, "/") : "";
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-  const videoSrc = rawPath ? `${backendUrl}/${rawPath}` : "";
+  const videoSrc = getVideoUrl(video?.filepath);
 
   const formattedDate = video?.createdAt
     ? (() => {
