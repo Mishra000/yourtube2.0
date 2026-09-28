@@ -1,44 +1,71 @@
+import ChannelHeader from "@/components/ChannelHeader";
+import Channeltabs from "@/components/Channeltabs";
+import ChannelVideos from "@/components/ChannelVideos";
+import VideoUploader from "@/components/VideoUploader";
 import { useUser } from "@/lib/AuthContext";
+import { notFound } from "next/navigation";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import Channeldialogue from "@/components/channeldialogue";
-import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import React from "react";
 
-export default function ChannelPage() {
-  const { user } = useUser();
+const index = () => {
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  useEffect(() => {
-    if (user?._id && user?.channelname) {
-      router.replace(`/channel/${user._id}`);
-    }
-  }, [user, router]);
-
-  if (!user) {
+  const { id } = router.query;
+  const { user } = useUser();
+  // const user: any = {
+  //   id: "1",
+  //   name: "John Doe",
+  //   email: "john@example.com",
+  //   image: "https://github.com/shadcn.png?height=32&width=32",
+  // };
+  try {
+    let channel = user;
+   
+    const videos = [
+      {
+        _id: "1",
+        videotitle: "Amazing Nature Documentary",
+        filename: "nature-doc.mp4",
+        filetype: "video/mp4",
+        filepath: "/videos/nature-doc.mp4",
+        filesize: "500MB",
+        videochanel: "Nature Channel",
+        Like: 1250,
+        views: 45000,
+        uploader: "nature_lover",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        _id: "2",
+        videotitle: "Cooking Tutorial: Perfect Pasta",
+        filename: "pasta-tutorial.mp4",
+        filetype: "video/mp4",
+        filepath: "/videos/pasta-tutorial.mp4",
+        filesize: "300MB",
+        videochanel: "Chef's Kitchen",
+        Like: 890,
+        views: 23000,
+        uploader: "chef_master",
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+      },
+    ];
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <User className="w-16 h-16 text-gray-400 mb-4" />
-        <h2 className="text-xl font-bold mb-2">Sign in to view your channel</h2>
+      <div className="flex-1 min-h-screen bg-white">
+        <div className="max-w-full mx-auto">
+          <ChannelHeader channel={channel} user={user} />
+          <Channeltabs />
+          <div className="px-4 pb-8">
+            <VideoUploader channelId={id} channelName={channel?.channelname} />
+          </div>
+          <div className="px-4 pb-8">
+            <ChannelVideos videos={videos} />
+          </div>
+        </div>
       </div>
     );
+  } catch (error) {
+    console.error("Error fetching channel data:", error);
+   
   }
+};
 
-  return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <User className="w-16 h-16 text-gray-400 mb-4" />
-      <h2 className="text-2xl font-bold mb-2">You don't have a channel yet</h2>
-      <p className="text-gray-600 mb-6">Create a channel to upload videos and share content</p>
-      <Button onClick={() => setIsDialogOpen(true)} className="bg-red-600 hover:bg-red-700">
-        Create Channel
-      </Button>
-
-      <Channeldialogue
-        isopen={isDialogOpen}
-        onclose={() => setIsDialogOpen(false)}
-        mode="create"
-      />
-    </div>
-  );
-}
+export default index;
