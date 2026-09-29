@@ -13,6 +13,7 @@ interface Device {
 }
 
 interface PreJoinProps {
+  roomId?: string;
   userName: string;
   onJoin: (opts: {
     audioEnabled: boolean;
@@ -23,7 +24,7 @@ interface PreJoinProps {
   isLoading?: boolean;
 }
 
-export default function PreJoin({ userName, onJoin, isLoading }: PreJoinProps) {
+export default function PreJoin({ roomId, userName, onJoin, isLoading }: PreJoinProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -131,6 +132,11 @@ export default function PreJoin({ userName, onJoin, isLoading }: PreJoinProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-4 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Ready to join?</h1>
+      {roomId && (
+        <div className="text-xs text-gray-600 font-mono bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+          Room ID: <span className="font-bold text-gray-900">{roomId}</span>
+        </div>
+      )}
       <p className="text-gray-500 text-sm">
         Joining as <span className="font-semibold text-gray-800">{userName}</span>
       </p>
@@ -246,7 +252,7 @@ export default function PreJoin({ userName, onJoin, isLoading }: PreJoinProps) {
         {isLoading ? (
           <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
         ) : null}
-        {isLoading ? "Joining…" : "Join now"}
+        {isLoading ? "Joining…" : "Join Meeting"}
       </button>
     </div>
   );

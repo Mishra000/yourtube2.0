@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { toast } from "sonner";
-import { Clock, FlipHorizontal } from "lucide-react";
+import { Clock, FlipHorizontal, Copy, Check, Video } from "lucide-react";
 
 import { useUser } from "@/lib/AuthContext";
 import axiosInstance from "@/lib/axiosinstance";
@@ -50,11 +50,12 @@ function useCallTimer(startTime: number | null) {
 export default function MeetRoomPage() {
   const router = useRouter();
   const { roomId } = router.query as { roomId: string };
-  const { user } = useUser();
+  const { user, handlegooglesignin } = useUser();
 
   // Phase: "prejoin" | "in-meeting" | "ended"
   const [phase, setPhase] = useState<"prejoin" | "in-meeting" | "ended">("prejoin");
   const [joiningLoading, setJoiningLoading] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   // Local media
@@ -587,9 +588,21 @@ export default function MeetRoomPage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] text-center p-4">
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900">Sign in required</h2>
-          <p className="text-gray-500">You need to be signed in to join a meeting.</p>
+        <div className="max-w-md w-full space-y-4 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto">
+            <Video className="w-7 h-7" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900">Sign in to Join Meeting</h2>
+          <p className="text-gray-500 text-sm">
+            You need to be signed in to join meeting room{" "}
+            <code className="font-mono font-bold text-gray-800">{roomId}</code>.
+          </p>
+          <button
+            onClick={handlegooglesignin}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-sm"
+          >
+            Sign In with Google
+          </button>
         </div>
       </div>
     );
@@ -637,6 +650,7 @@ export default function MeetRoomPage() {
           <title>Join Meeting – YourTube</title>
         </Head>
         <PreJoin
+          roomId={roomId}
           userName={user.name || user.email || "Guest"}
           onJoin={joinMeeting}
           isLoading={joiningLoading}
@@ -690,8 +704,34 @@ export default function MeetRoomPage() {
               <Clock className="w-4 h-4" />
               <span className="font-mono">{callDuration}</span>
             </div>
-            <div className="text-gray-400 text-sm hidden md:block">
-              Room: <code className="text-gray-200 font-mono">{roomId}</code>
+            <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <span className="hidden md:inline">Room:</span>
+              <code className="text-gray-200 font-mono bg-gray-800 px-2 py-0.5 rounded border border-gray-700/60">
+                {roomId}
+              </code>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/meet/${roomId}`;
+                  navigator.clipboard.writeText(url);
+                  setCopiedLink(true);
+                  toast.success("Meeting link copied to clipboard!");
+                  setTimeout(() => setCopiedLink(false), 2000);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs rounded-lg transition-colors border border-gray-700"
+                title="Copy Meeting Link"
+              >
+                {copiedLink ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Copy Link</span>
+                  </>
+                )}
+              </button>
             </div>
             {isLocked && (
               <span className="text-xs bg-yellow-600/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-600/30">

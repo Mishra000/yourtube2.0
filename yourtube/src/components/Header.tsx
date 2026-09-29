@@ -12,6 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Channeldialogue from "./channeldialogue";
+import MeetingDialog from "./meet/MeetingDialog";
 import { useRouter } from "next/router";
 import { useUser } from "@/lib/AuthContext";
 
@@ -25,6 +26,7 @@ const Header = () => {
   // };
   const [searchQuery, setSearchQuery] = useState("");
   const [isdialogeopen, setisdialogeopen] = useState(false);
+  const [isMeetingOpen, setIsMeetingOpen] = useState(false);
   const router = useRouter();
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,11 +80,17 @@ const Header = () => {
         </Button>
       </form>
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsMeetingOpen(true)}
+          title="Create or Join Video Call"
+          id="header-video-call-btn"
+        >
+          <VideoIcon className="w-6 h-6 text-gray-700 hover:text-red-600 transition-colors" />
+        </Button>
         {user ? (
           <>
-            <Button variant="ghost" size="icon">
-              <VideoIcon className="w-6 h-6" />
-            </Button>
             <Button variant="ghost" size="icon">
               <Bell className="w-6 h-6" />
             </Button>
@@ -145,6 +153,10 @@ const Header = () => {
         isopen={isdialogeopen}
         onclose={() => setisdialogeopen(false)}
         mode="create"
+      />
+      <MeetingDialog
+        isOpen={isMeetingOpen}
+        onClose={() => setIsMeetingOpen(false)}
       />
     </header>
   );

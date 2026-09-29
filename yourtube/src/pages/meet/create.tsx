@@ -54,9 +54,24 @@ export default function MeetCreatePage() {
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
-    const id = joinRoomId.trim().toUpperCase();
-    if (!id) return;
-    router.push(`/meet/${id}`);
+    const raw = joinRoomId.trim();
+    if (!raw) return;
+
+    let extractedId = raw;
+    if (raw.includes("/meet/")) {
+      const parts = raw.split("/meet/");
+      extractedId = parts[parts.length - 1].split("?")[0].split("#")[0];
+    } else if (raw.includes("/")) {
+      const parts = raw.split("/");
+      extractedId = parts[parts.length - 1].split("?")[0].split("#")[0];
+    }
+    extractedId = extractedId.trim().toUpperCase();
+
+    if (!extractedId) {
+      toast.error("Invalid room ID or link");
+      return;
+    }
+    router.push(`/meet/${extractedId}`);
   };
 
   return (
@@ -103,7 +118,7 @@ export default function MeetCreatePage() {
                       ) : (
                         <Video className="w-4 h-4" />
                       )}
-                      {loading ? "Creating…" : "New meeting"}
+                      {loading ? "Starting…" : "Start Meeting"}
                     </button>
                   ) : (
                     <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
@@ -128,7 +143,7 @@ export default function MeetCreatePage() {
 
                   <div>
                     <label className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                      Room ID
+                      Current Room ID
                     </label>
                     <div className="flex items-center gap-2 mt-1">
                       <code className="flex-1 bg-gray-100 rounded-lg px-3 py-2 text-lg font-mono font-bold tracking-widest text-gray-800">
@@ -136,14 +151,15 @@ export default function MeetCreatePage() {
                       </code>
                       <button
                         onClick={() => copyToClipboard(createdMeeting.roomId)}
-                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                        title="Copy room ID"
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs font-medium"
+                        title="Copy Room ID"
                       >
                         {copied ? (
                           <Check className="w-4 h-4 text-green-600" />
                         ) : (
                           <Copy className="w-4 h-4 text-gray-600" />
                         )}
+                        <span>{copied ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
                   </div>
@@ -160,14 +176,15 @@ export default function MeetCreatePage() {
                       />
                       <button
                         onClick={() => copyToClipboard(createdMeeting.link)}
-                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                        title="Copy link"
+                        className="px-3 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
+                        title="Copy Link"
                       >
                         {copied ? (
-                          <Check className="w-4 h-4 text-green-600" />
+                          <Check className="w-3.5 h-3.5 text-green-400" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-600" />
+                          <Copy className="w-3.5 h-3.5" />
                         )}
+                        <span>{copied ? "Copied" : "Copy Link"}</span>
                       </button>
                     </div>
                   </div>
@@ -177,7 +194,7 @@ export default function MeetCreatePage() {
                     className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     <ArrowRight className="w-4 h-4" />
-                    Join now
+                    Join Meeting
                   </Link>
                 </div>
               )}
@@ -197,9 +214,8 @@ export default function MeetCreatePage() {
                   type="text"
                   value={joinRoomId}
                   onChange={(e) => setJoinRoomId(e.target.value)}
-                  placeholder="Enter room ID (e.g. ABC123DEFG)"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal placeholder:font-sans"
-                  maxLength={10}
+                  placeholder="Enter room ID or paste meeting link"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono tracking-wide placeholder:normal-case placeholder:tracking-normal placeholder:font-sans"
                 />
                 <button
                   type="submit"
@@ -207,7 +223,7 @@ export default function MeetCreatePage() {
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
-                  Join meeting
+                  Join Meeting
                 </button>
               </form>
             </div>
